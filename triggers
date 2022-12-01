@@ -1,0 +1,37 @@
+create or replace trigger emp_trigger
+before insert or delete or update on emp
+for each row
+begin
+dbms_output.put_line('Old department ' || :OLD.deptno);
+dbms_output.put_line('New department ' || :NEW.deptno);
+end;
+
+update emp set deptno=30 where empno=7839;
+
+create or replace trigger job_trigger
+before insert or delete or update on emp
+for each row
+begin
+dbms_output.put_line('Previous job '|| :old.job);
+dbms_output.put_line('Present job ' || :new.job);
+end;
+update emp set job='Account' where empno=7839;
+
+create or replace trigger sal_trigger
+before insert or delete or update on emp
+for each row
+declare
+sal_min number;
+begin
+select min(sal) into sal_min from emp where deptno=30;
+if sal_min>:new.sal then
+update emp
+set sal=sal_min
+where empno=:new.empno;
+end if;
+end;
+
+update emp set sal=2000 where empno=7369;
+
+rollback;
+
